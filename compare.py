@@ -7,7 +7,7 @@ def main():
         for n, (a, b) in enumerate(zip(rf, im), 1):
             x, y = json.loads(a), json.loads(b)
             if x.get("state") != y.get("state") or x.get("ok") != y.get("ok"):
-                print(json.dumps({"case": n, "first_difference": first_diff(x, y), "oracle": x, "implementation": y}, indent=2))
+                print(json.dumps({"case": n, "first_difference": first_diff(x.get("state"), y.get("state"), ".state"), "oracle_ok": x.get("ok"), "implementation_ok": y.get("ok"), "oracle": x, "implementation": y}, indent=2))
                 return 1
     print("no differences"); return 0
 
