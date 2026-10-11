@@ -50,7 +50,7 @@ function handle(req) {
     if (e === 0 && op === 0) halted = true;
     else error = e instanceof Error ? e.message : `oracle exception: ${String(e)}`;
   }
-  const out = {ok: error === null, backend: 'meisaka', source: 'Meisaka Emu 0.22 UMCPU6.step', instruction: op.toString(16).toUpperCase().padStart(2, '0'), state: state(c, before, halted)};
+  const out = {ok: error === null, backend: 'reference', source: 'Meisaka Emu 0.22 UMCPU6.step', instruction: op.toString(16).toUpperCase().padStart(2, '0'), state: state(c, before, halted)};
   if (error) out.error = error;
   return out;
 }

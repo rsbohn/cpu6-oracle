@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse, json, sys
 from dataclasses import dataclass
 
-SOURCE = "Meisaka Emu 0.22 UMCPU6.step (sha256 dbe1f84e1d91346eada5a7fa0d11f1a525f24c3b2848fa69dad282138df9cf94)"
+SOURCE = "independent Python CPU6 model"
 REG_NAMES = ("AX", "BX", "RT", "DX", "EX", "SP", "GX", "HX")
 C, N, Z, I = 1, 2, 4, 8
 
@@ -128,7 +128,7 @@ def handle(req, backend):
     except Exception as e: return response(m, before, backend, error=str(e))
 
 def main():
-    p = argparse.ArgumentParser(); p.add_argument("--backend", choices=("reference", "biscvit"), default="reference"); p.add_argument("command", nargs="?")
+    p = argparse.ArgumentParser(); p.add_argument("--backend", choices=("implementation",), default="implementation"); p.add_argument("command", nargs="?")
     args = p.parse_args()
     if args.command == "compare": return compare(args)
     for line in sys.stdin:
