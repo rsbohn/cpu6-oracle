@@ -14,6 +14,24 @@ python3 compare.py --reference reference.jsonl --implementation implementation.j
 python3 -m unittest discover -s tests
 ```
 
+## Run the actual Meisaka UMCPU6 wrapper
+
+The original Meisaka source is not included in this repository. Obtain a
+working copy of `Emu 0.22/src/cen.ts`, then build the small Node-compatible
+extraction and run its JSON-lines adapter:
+
+```sh
+npm install
+MEISAKA_SOURCE='/path/to/Emu 0.22/src/cen.ts' npm run build-meisaka
+node meisaka-wrapper.js < cases.jsonl
+```
+
+The build extracts `UMCPU6`, `SysMem`, the opcode table, register views, and
+required helpers without loading the browser UI. Interrupts, clocks, devices,
+and parity-break behavior remain disabled for the deterministic core suite.
+The generated extraction is ignored by git; the upstream source path and hash
+are recorded in `meisaka-provenance.json`.
+
 Each request is one complete instruction:
 
 ```json

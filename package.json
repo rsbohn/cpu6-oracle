@@ -1,0 +1,7 @@
+{
+  "name": "cpu6-oracle",
+  "private": true,
+  "type": "commonjs",
+  "scripts": { "build-meisaka": "node tools/build-meisaka-core.js" },
+  "devDependencies": { "typescript": "^5.9.3" }
+}

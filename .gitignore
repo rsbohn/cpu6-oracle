@@ -5,3 +5,5 @@ __pycache__/
 # .NET build output
 **/bin/
 **/obj/
+node_modules/
+build/
