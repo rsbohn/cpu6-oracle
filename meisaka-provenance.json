@@ -1,0 +1,9 @@
+{
+  "project": "Meisaka Emu 0.22",
+  "source": "UMCPU6.step in src/cen.ts",
+  "source_url": "https://github.com/Nakazoto/CenturionComputer",
+  "sha256": "dbe1f84e1d91346eada5a7fa0d11f1a525f24c3b2848fa69dad282138df9cf94",
+  "class": "UMCPU6",
+  "step": "UMCPU6.step",
+  "scope": "deterministic core; no interrupts, clock, terminal, or devices"
+}
