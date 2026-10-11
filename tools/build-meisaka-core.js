@@ -23,6 +23,7 @@ const pieces = [
   between('function LevelRegisters(', 'interface ICCPU'),
   between('class SysMem implements', 'class ROM512'),
   between('const enum OPM', 'const annotation_data'),
+  between('const enum ARITH_OP', 'const editors:'),
   between('class UMCPU6 implements', 'class CPU6'),
 ];
 const prelude = `

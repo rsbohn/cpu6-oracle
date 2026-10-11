@@ -70,27 +70,40 @@ class Machine:
         else: raise NotImplementedError(f"opcode {op:02X} is outside the initial deterministic slice")
         return op
     def _misc(self, op, width):
-        # 20-27/30-37 operate on a register encoded in a following byte when
-        # bit 3 is clear; the implicit forms operate on AL/AX.
+        # RC encodes a byte register in the high nibble and a count in the
+        # low nibble. Word RC forms use an even byte-register code (A/B/X...).
         base = 0x20 if width == 8 else 0x30
         if (op & 8) == 0:
-            enc = self.fetch(); r = (enc >> (4 if width == 8 else 5)) & 7
-            count = (enc & 15) + 1 if (enc & 15) else 1
+            enc = self.fetch()
+            regcode = enc >> 4
+            count = (enc & 15) + (1 if (op - base) in (0, 1, 4, 5, 6, 7) else 0)
         else:
-            r, count = 0, 1
+            regcode = 1 if width == 8 else 0  # implicit AL/AX
+            count = 1
+        if width == 16 and (regcode & 1):
+            raise ValueError(f'odd word register encoding {regcode:X}')
+        r = regcode >> 1 if width == 16 else regcode
+        word_r = regcode >> 1
         mask = 0xff if width == 8 else 0xffff
-        for _ in range(count):
-            old = self.regs[r]
-            kind = op - base
-            if kind == 0: value, carry = old + 1, None
-            elif kind == 1: value, carry = old - 1, None
-            elif kind == 2: value, carry = 0, None
-            elif kind == 3: value, carry = old ^ mask, None
-            elif kind == 4: value, carry = old >> 1, bool(old & 1)
-            elif kind == 5: value, carry = old << 1, bool(old & (0x80 if width == 8 else 0x8000))
-            elif kind == 6: value, carry = (old >> 1) | ((0x80 if width == 8 else 0x8000) if self.flags&C else 0), bool(old & 1)
-            else: value, carry = (old << 1) | (1 if self.flags&C else 0), bool(old & (0x80 if width == 8 else 0x8000))
-            self.regs[r] = value & mask; self.set_flags(value, width, carry)
+        old = ((self.regs[word_r] >> 8) & 0xff if (regcode & 1) == 0 else (self.regs[word_r] & 0xff)) if width == 8 else self.regs[r]
+        kind = (op - base) & 7
+        if kind == 0:
+            value = old + count
+            carry = value > mask
+        elif kind == 1:
+            value, carry = old - count, True
+        elif kind == 2: value, carry = 0, None
+        elif kind == 3: value, carry = old ^ mask, None
+        elif kind == 4: value, carry = old >> count, bool((old >> (count - 1)) & 1)
+        elif kind == 5: value, carry = old << count, bool((old >> (width - count)) & 1)
+        elif kind == 6: value, carry = (old >> count) | ((self.flags & C) and (1 << (width - count)) or 0), bool((old >> (count - 1)) & 1)
+        else: value, carry = (old << count) | (1 if self.flags & C else 0), bool((old >> (width - count)) & 1)
+        value &= mask
+        if width == 8:
+            if regcode & 1: self.regs[word_r] = (self.regs[word_r] & 0xff00) | value
+            else: self.regs[word_r] = (value << 8) | (self.regs[word_r] & 0xff)
+        else: self.regs[r] = value
+        self.set_flags(value, width, carry)
 
 def response(machine, before, backend, op=None, error=None):
     writes = []
